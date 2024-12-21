@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tracer Alumni</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center">Tracer Alumni</h1>
+        <div class="card mt-4">
+            <div class="card-body">
+                <form id="alumniForm">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Nama</label>
+                        <input type="text" id="name" name="name" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="graduation_year" class="form-label">Tahun Lulus</label>
+                        <input type="number" id="graduation_year" name="graduation_year" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="job" class="form-label">Pekerjaan</label>
+                        <input type="text" id="job" name="job" class="form-control">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Tambah Alumni</button>
+                </form>
+            </div>
+        </div>
+        <div class="mt-4">
+            <h2>Daftar Alumni</h2>
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>No</th>
+                        <th>Nama</th>
+                        <th>Tahun Lulus</th>
+                        <th>Pekerjaan</th>
+                        <th>Tanggal Input</th>
+                    </tr>
+                </thead>
+                <tbody id="alumniTable"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function () {
+            function fetchAlumni() {
+                $.getJSON('backend.php?action=get', function (data) {
+                    let rows = '';
+                    data.forEach((item, index) => {
+                        rows += `
+                            <tr>
+                                <td>${index + 1}</td>
+                                <td>${item.name}</td>
+                                <td>${item.graduation_year}</td>
+                                <td>${item.job}</td>
+                                <td>${item.created_at}</td>
+                            </tr>
+                        `;
+                    });
+                    $('#alumniTable').html(rows);
+                });
+            }
+
+            $('#alumniForm').on('submit', function (e) {
+                e.preventDefault();
+                const formData = $(this).serialize();
+
+                $.post('backend.php?action=add', formData, function (response) {
+                    const res = JSON.parse(response);
+                    if (res.status === 'success') {
+                        alert('Data alumni berhasil ditambahkan');
+                        $('#alumniForm')[0].reset();
+                        fetchAlumni();
+                    } else {
+                        alert('Gagal menambahkan data');
+                    }
+                });
+            });
+
+            fetchAlumni();
+        });
+    </script>
+</body>
+</html>
+``
